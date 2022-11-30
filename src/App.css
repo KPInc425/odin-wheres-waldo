@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  position: relative;
 }
 
 .App-logo {
@@ -42,7 +43,23 @@
   border: 2px outset rgb(255, 255, 255);
 }
 
+.clickCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  background-color: rgb(179, 0, 0);
+  border: 2px outset rgb(255, 255, 255);
+  position: absolute;
+  top: 445;
+  left: 460;
+}
+
 .flex {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.flexButtons {
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -80,9 +97,12 @@
   height: 70vh;
 }
 
-.storyBoard div {
+.hiddenObjectImage {
+  /* position: relative; */
   height: 100%;
   width: 100%;
+  /* cursor: url('./media/MagnifyPoint.png'), auto; */
+  cursor: crosshair;
 }
 
 
@@ -93,6 +113,23 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media screen and (max-width: 850px) {
+  .circleStyle, .appControls button {
+    width: 40px;
+    height: 40px;
+    font-size: 50%;
+  }
+
+  .flex {
+    flex-direction: column;
+    row-gap: 10px;
+  }
+
+  .charBox, .appControls {
+    width: 95%;
   }
 }
 
