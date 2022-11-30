@@ -37,13 +37,33 @@ function App() {
     <div className="App">
       <h1>{ pageDefaultTitle || "Find the Hidden Object!" }</h1> 
       <ControlBoard />
+      <StoryBoard />
     </div>
   );
 }
 
+const StoryBoard = () => {
+  return (
+    <div className='storyBoard backWaldoStyle'>
+      <div className='imagesContainer flex'>
+        <HiddenObjectImage />
+      </div>
+    </div>
+  )
+}
+
+const HiddenObjectImage = () => {
+  return (
+    <div className='hiddenObjectImage backWaldoStyle'>
+      <h1>Needs Image background</h1>
+      
+    </div>
+  )
+}
+
 const ControlBoard = () => {
   return (
-    <div className='controlBoard flex'>
+    <div className='controlBoard flex backWaldoStyle'>
       <CharacterBox />
       <AppControls />
     </div>
@@ -52,7 +72,7 @@ const ControlBoard = () => {
 
 const CharacterBox = () => {
   return (
-    <div className='charBox'>
+    <div className='charBox backWaldoStyle'>
       <h3>Who's Missing?</h3>
       <div className='flex'>
         <div id='char1Avatar' className='circleStyle'></div>
@@ -65,7 +85,7 @@ const CharacterBox = () => {
 
 const AppControls = () => {
   return (
-    <div className='appControls flex'>
+    <div className='appControls flex backWaldoStyle'>
       <div className="flex">
         <button className='circleStyle'>Start</button>
         <button className='circleStyle'>End</button>
