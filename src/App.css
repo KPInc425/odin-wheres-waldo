@@ -28,6 +28,46 @@
   color: #61dafb;
 }
 
+.circleStyle {
+  width: 60px;
+  height: 60px;
+  border-radius: 40px;
+  background-color: green;
+  border: 2px solid red;
+}
+
+.flex {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.charBox {
+  border: 2px solid blue;
+  width: 25vw;
+  height: 10vh;
+  padding: 10px;
+}
+
+.charBox h3 {
+  margin: 0 0 5px 0;
+}
+
+.appControls {
+  border: 2px solid blue;
+  width: 30vw;
+  height: 10vh;
+  padding: 10px;
+}
+
+.appControls button {
+  margin: 5px;
+  width: 60px;
+  height: 60px;
+}
+
+
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

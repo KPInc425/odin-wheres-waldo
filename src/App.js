@@ -1,25 +1,81 @@
-import logo from './logo.svg';
 import './App.css';
 
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, getDoc, getDocs, query, collection } from 'firebase/firestore'
+
+import { getFirebaseConfig } from './firebaseConfig';
+import { useEffect, useState } from 'react';
+
+const firebaseConfig = getFirebaseConfig();
+
 function App() {
+
+  const [pageDefaultTitle, setPageDefaultTitle] = useState(null);
+
+  useEffect(() => {
+    // Had to put async function inside useEffect
+    const getDBTitle = async () => {
+      // query collection
+      // const titleQuery = query(collection(getFirestore(), 'default'));
+      // const titleData = await getDocs(titleQuery);
+      // const tmpArray = titleData.docs.map(doc => doc.data());
+      // console.log(tmpArray[0].title);
+    
+      // query single doc
+      const titleSnap = await getDoc(doc(getFirestore(), 'default', 'HomePage'));
+      const title = titleSnap.data().title;
+      console.log(typeof title);
+    
+      setPageDefaultTitle(title);
+    }
+    getDBTitle();
+  }, [])
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>{ pageDefaultTitle || "Find the Hidden Object!" }</h1> 
+      <ControlBoard />
     </div>
   );
 }
+
+const ControlBoard = () => {
+  return (
+    <div className='controlBoard flex'>
+      <CharacterBox />
+      <AppControls />
+    </div>
+  )
+}
+
+const CharacterBox = () => {
+  return (
+    <div className='charBox'>
+      <h3>Who's Missing?</h3>
+      <div className='flex'>
+        <div id='char1Avatar' className='circleStyle'></div>
+        <div id='char2Avatar' className='circleStyle'></div>
+        <div id='char3Avatar' className='circleStyle'></div>
+      </div>
+    </div>
+  )
+}
+
+const AppControls = () => {
+  return (
+    <div className='appControls flex'>
+      <div className="flex">
+        <button className='circleStyle'>Start</button>
+        <button className='circleStyle'>End</button>
+        <button className='circleStyle'>Gallery</button>
+        <button className='circleStyle'>High Scores</button>
+      </div>
+    </div>
+  )
+}
+
+initializeApp(firebaseConfig);
 
 export default App;
