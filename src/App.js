@@ -55,12 +55,31 @@ function App() {
 
   }
 
+  const moveCursor = (e) => {
+    const newCursor = document.getElementById('newCursor');
+    const imgContainer = document.querySelector('.hiddenObjectImage');
+    // console.log(imgContainer.offsetWidth);
+    // console.log(window.innerWidth);
+
+    const y = e.pageY;
+    const x = e.pageX;
+
+    if ( x > (window.innerWidth - imgContainer.offsetWidth) &&
+         y > (window.innerHeight - imgContainer.offsetHeight + 40) &&
+         x < (imgContainer.offsetWidth - 10) &&
+         y < window.innerHeight - (window.innerHeight * 0.02) ) {
+      newCursor.style.top = `${y}px`;
+      newCursor.style.left = `${x}px`;
+    }
+  }
+
 
   return (
-    <div className="App">
+    <div className="App" onMouseMove={ moveCursor }>
       <h1>{ pageDefaultTitle || "Find the Hidden Object!" }</h1> 
+      <div id='newCursor' className='cursorCircle' onClick={ handleImgClick }></div>
       <ControlBoard />
-      <StoryBoard handleImgClick={ handleImgClick }/>
+      <StoryBoard  handleImgClick={ handleImgClick }/>
     </div>
   );
 }
