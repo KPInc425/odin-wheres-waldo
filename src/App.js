@@ -25,7 +25,7 @@ function App() {
       // query single doc
       const titleSnap = await getDoc(doc(getFirestore(), 'default', 'HomePage'));
       const title = titleSnap.data().title;
-      console.log(typeof title);
+      // console.log(typeof title);
     
       setPageDefaultTitle(title);
     }
@@ -33,44 +33,72 @@ function App() {
   }, [])
 
   const handleImgClick = (e) => {
-    console.log("click");
+    // console.log("click");
     const y = e.pageY;
     const x = e.pageX;
 
     console.log({x, y});
-    console.log(x);
-    console.log(y);
+    // console.log(x);
+    // console.log(y);
 
     // const img = document.querySelector('.hiddenObjectImage');
-    const newCircle = document.createElement('div');
-    newCircle.classList.add('clickCircle');
-    newCircle.style.left = `${x - 12}px`;
-    newCircle.style.top = `${y - 32}px`;
-
-    console.log(newCircle.style.top);
-    console.log(newCircle.style.left);
-
-    document.querySelector('.hiddenObjectImage').appendChild(newCircle);
+    if (checkInBounds(x, y)) {
+      const newCircle = document.createElement('div');
+      newCircle.classList.add('clickCircle');
+      newCircle.style.left = `${x - 12}px`;
+      newCircle.style.top = `${y - 32}px`;
+  
+      // console.log(newCircle.style.top);
+      // console.log(newCircle.style.left);
+  
+      document.querySelector('.hiddenObjectImage').appendChild(newCircle);
+    }
 
 
   }
 
+  const checkInBounds = (x, y) => {
+    const rect = document.querySelector('.hiddenObjectImage').getBoundingClientRect();
+    const top = rect.top;
+    const left = rect.left
+    const cursorSize = 10;
+
+    if ( x > left + cursorSize &&
+      y > top + cursorSize &&
+      x < (rect.width + left - cursorSize) &&
+      y < (rect.height + top - cursorSize)) {
+        return true;
+    }
+
+    return false;
+  }
+
   const moveCursor = (e) => {
     const newCursor = document.getElementById('newCursor');
-    const imgContainer = document.querySelector('.hiddenObjectImage');
+    // const imgContainer = document.querySelector('.hiddenObjectImage');
+    const cursorHalfSize = 10;
     // console.log(imgContainer.offsetWidth);
     // console.log(window.innerWidth);
 
-    const y = e.pageY;
+    // console.log(imgContainer.getBoundingClientRect());
+    // const containerRect = imgContainer.getBoundingClientRect();
+    // const left = containerRect.left;
+    // const top = containerRect.top;
     const x = e.pageX;
+    const y = e.pageY;
+    console.log({x, y})
 
-    if ( x > (window.innerWidth - imgContainer.offsetWidth) &&
-         y > (window.innerHeight - imgContainer.offsetHeight + 40) &&
-         x < (imgContainer.offsetWidth - 10) &&
-         y < window.innerHeight - (window.innerHeight * 0.02) ) {
+    if (checkInBounds(x, y)) {
       newCursor.style.top = `${y}px`;
       newCursor.style.left = `${x}px`;
     }
+    // if ( x > (window.innerWidth - imgContainer.offsetWidth) &&
+    //      y > (window.innerHeight - imgContainer.offsetHeight + 40) &&
+    //      x < (imgContainer.offsetWidth - 10) &&
+    //      y < window.innerHeight - (window.innerHeight * 0.02) ) {
+    //   newCursor.style.top = `${y}px`;
+    //   newCursor.style.left = `${x}px`;
+    // }
   }
 
 
