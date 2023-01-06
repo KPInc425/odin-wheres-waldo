@@ -4,14 +4,17 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, getDocs, query, collection } from 'firebase/firestore'
 
 import { getFirebaseConfig } from './firebaseConfig';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const firebaseConfig = getFirebaseConfig();
 
 function App() {
 
-  const [pageDefaultTitle, setPageDefaultTitle] = useState(null);
-
+  const [ pageDefaultTitle, setPageDefaultTitle ] = useState(null);
+  const [ showTargetBox, setShowTargetBox ] = useState(false);
+  const [ targetBoxLocation, setTargetBoxLocation ] = useState({top: `0px`, left: `0px`})
+  const [ cursorLocation, setCursorLocation ] = useState({top: `0px`, left: `0px`});
+  const imgRef = useRef(null);
 
   useEffect(() => {
     // Had to put async function inside useEffect
@@ -34,6 +37,13 @@ function App() {
 
   const handleImgClick = (e) => {
     // console.log("click");
+    
+    // remove activeLocation if exists
+    let activeLocation = document.querySelector('.activeLocation');
+    console.log(activeLocation);
+    if (activeLocation) {
+      activeLocation.classList.remove('activeLocation');
+    }
     const y = e.pageY;
     const x = e.pageX;
 
@@ -44,24 +54,35 @@ function App() {
     // const img = document.querySelector('.hiddenObjectImage');
     if (checkInBounds(x, y)) {
       const newCircle = document.createElement('div');
-      newCircle.classList.add('clickCircle');
-      newCircle.style.left = `${x - 12}px`;
-      newCircle.style.top = `${y - 32}px`;
-  
-      // console.log(newCircle.style.top);
-      // console.log(newCircle.style.left);
-  
+      newCircle.classList.add('clickCircle','activeLocation');
+      let newLeft = `${x - 7}px`;
+      let newTop = `${y - 29}px`;
+      // Hardcoded #'s are based on cursor size
+      newCircle.style.left = newLeft;
+      newCircle.style.top = newTop;
       document.querySelector('.hiddenObjectImage').appendChild(newCircle);
+      setTargetBoxLocation({ top: newTop, left: newLeft });
+      setShowTargetBox(true);
     }
+  }
 
+  const moveCursor = (e) => {
+    const x = e.pageX;
+    const y = e.pageY;
 
+    if (checkInBounds(x, y)) {
+      const newTop = `${y}px`;
+      const newLeft = `${x}px`;
+      setCursorLocation({top: newTop, left: newLeft});
+    }
   }
 
   const checkInBounds = (x, y) => {
-    const rect = document.querySelector('.hiddenObjectImage').getBoundingClientRect();
+    // Get play area for cursor bounds
+    const rect = imgRef.current.getBoundingClientRect();
     const top = rect.top;
     const left = rect.left
-    const cursorSize = 10;
+    const cursorSize = 5;
 
     if ( x > left + cursorSize &&
       y > top + cursorSize &&
@@ -73,58 +94,46 @@ function App() {
     return false;
   }
 
-  const moveCursor = (e) => {
-    const newCursor = document.getElementById('newCursor');
-    // const imgContainer = document.querySelector('.hiddenObjectImage');
-    const cursorHalfSize = 10;
-    // console.log(imgContainer.offsetWidth);
-    // console.log(window.innerWidth);
-
-    // console.log(imgContainer.getBoundingClientRect());
-    // const containerRect = imgContainer.getBoundingClientRect();
-    // const left = containerRect.left;
-    // const top = containerRect.top;
-    const x = e.pageX;
-    const y = e.pageY;
-    console.log({x, y})
-
-    if (checkInBounds(x, y)) {
-      newCursor.style.top = `${y}px`;
-      newCursor.style.left = `${x}px`;
-    }
-    // if ( x > (window.innerWidth - imgContainer.offsetWidth) &&
-    //      y > (window.innerHeight - imgContainer.offsetHeight + 40) &&
-    //      x < (imgContainer.offsetWidth - 10) &&
-    //      y < window.innerHeight - (window.innerHeight * 0.02) ) {
-    //   newCursor.style.top = `${y}px`;
-    //   newCursor.style.left = `${x}px`;
-    // }
-  }
-
 
   return (
     <div className="App" onMouseMove={ moveCursor }>
       <h1>{ pageDefaultTitle || "Find the Hidden Object!" }</h1> 
-      <div id='newCursor' className='cursorCircle' onClick={ handleImgClick }></div>
+      <div id='newCursor' className='cursorCircle' style={ cursorLocation } onClick={ handleImgClick }></div>
+      { showTargetBox
+        ?
+        <TargetBox newStyle={ targetBoxLocation }/> 
+        :
+        null
+      }
       <ControlBoard />
-      <StoryBoard  handleImgClick={ handleImgClick }/>
+      <StoryBoard imgRef={imgRef}  handleImgClick={ handleImgClick }/>
     </div>
   );
 }
 
-const StoryBoard = ({ handleImgClick }) => {
+const TargetBox = ({ newStyle }) => {
+  return (
+    <div>
+      <div className='TargetBox' style={ newStyle }>
+
+      </div>
+    </div>
+  )
+}
+
+const StoryBoard = ({ handleImgClick, imgRef }) => {
   return (
     <div className='storyBoard backWaldoStyle'>
 
-        <HiddenObjectImage handleImgClick={ handleImgClick } />
+        <HiddenObjectImage imgRef={imgRef} handleImgClick={ handleImgClick } />
 
     </div>
   )
 }
 
-const HiddenObjectImage = ({ handleImgClick }) => {
+const HiddenObjectImage = ({ handleImgClick, imgRef }) => {
   return (
-    <div className='hiddenObjectImage backWaldoStyle' onClick={ handleImgClick }>
+    <div ref={ imgRef } className='hiddenObjectImage backWaldoStyle' onClick={ handleImgClick }>
 
     </div>
   )
