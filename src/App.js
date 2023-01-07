@@ -13,6 +13,8 @@ function App() {
   const [ pageDefaultTitle, setPageDefaultTitle ] = useState(null);
   const [ showTargetBox, setShowTargetBox ] = useState(false);
   const [ targetBoxLocation, setTargetBoxLocation ] = useState({top: `0px`, left: `0px`})
+  const [ showActiveLocation, setShowActiveLocation ] = useState(false);
+  const [ activeLocation, setActiveLocation ] = useState({top: `0px`, left: `0px`});
   const [ cursorLocation, setCursorLocation ] = useState({top: `0px`, left: `0px`});
   const imgRef = useRef(null);
 
@@ -36,32 +38,18 @@ function App() {
   }, [])
 
   const handleImgClick = (e) => {
-    // console.log("click");
-    
-    // remove activeLocation if exists
-    let activeLocation = document.querySelector('.activeLocation');
-    console.log(activeLocation);
-    if (activeLocation) {
-      activeLocation.classList.remove('activeLocation');
-    }
     const y = e.pageY;
     const x = e.pageX;
 
     console.log({x, y});
-    // console.log(x);
-    // console.log(y);
 
-    // const img = document.querySelector('.hiddenObjectImage');
     if (checkInBounds(x, y)) {
-      const newCircle = document.createElement('div');
-      newCircle.classList.add('clickCircle','activeLocation');
+      // Hardcoded #'s are based on cursor size
       let newLeft = `${x - 7}px`;
       let newTop = `${y - 29}px`;
-      // Hardcoded #'s are based on cursor size
-      newCircle.style.left = newLeft;
-      newCircle.style.top = newTop;
-      document.querySelector('.hiddenObjectImage').appendChild(newCircle);
       setTargetBoxLocation({ top: newTop, left: newLeft });
+      setActiveLocation({ top: newTop, left: newLeft })
+      setShowActiveLocation(true);
       setShowTargetBox(true);
     }
   }
@@ -94,21 +82,57 @@ function App() {
     return false;
   }
 
+  const handleClearClick = (e) => {
+    const x = e.pageX;
+    const y = e.pageY;
+    if (!checkInBounds(x, y)) {
+      setShowActiveLocation(false);
+      setShowTargetBox(false);
+    }
+  }
+
 
   return (
-    <div className="App" onMouseMove={ moveCursor }>
+    <div className="App" onMouseMove={ moveCursor } onClick={ handleClearClick }>
       <h1>{ pageDefaultTitle || "Find the Hidden Object!" }</h1> 
       <div id='newCursor' className='cursorCircle' style={ cursorLocation } onClick={ handleImgClick }></div>
       { showTargetBox
         ?
-        <TargetBox newStyle={ targetBoxLocation }/> 
+        <div>
+          <TargetBox newStyle={ targetBoxLocation }/> 
+          <DropDownMenu location={ activeLocation }/>
+        </div>
         :
         null
       }
       <ControlBoard />
-      <StoryBoard imgRef={imgRef}  handleImgClick={ handleImgClick }/>
+      <StoryBoard 
+        imgRef={imgRef}  
+        handleImgClick={ handleImgClick } 
+        showActiveLocation={ showActiveLocation } 
+        activeLocation={ activeLocation }
+      />
     </div>
   );
+}
+
+const DropDownMenu = ({ choiceOne, choiceTwo, choiceThree, location }) => {
+  // console.log(location.left.split('p'));
+  const dropDownLocation = {
+    top: `${Number(location.top.split('p')[0]) - 26}px`,
+    left: `${Number(location.left.split('p')[0]) + 38}px`,
+  }
+  // console.log(dropDownLocation);
+  return (
+    <div className='dropDownMenu' style={ dropDownLocation }>
+      <ul>
+        <li><h4>Choices</h4></li>
+        <li>{ choiceOne || "choice1" }</li>
+        <li>{ choiceTwo || "choice2" }</li>
+        <li>{ choiceThree || "choice3" }</li>
+      </ul>
+    </div>
+  )
 }
 
 const TargetBox = ({ newStyle }) => {
@@ -121,19 +145,37 @@ const TargetBox = ({ newStyle }) => {
   )
 }
 
-const StoryBoard = ({ handleImgClick, imgRef }) => {
+const StoryBoard = ({ handleImgClick, imgRef, showActiveLocation, activeLocation }) => {
   return (
     <div className='storyBoard backWaldoStyle'>
 
-        <HiddenObjectImage imgRef={imgRef} handleImgClick={ handleImgClick } />
+        <HiddenObjectImage 
+          imgRef={imgRef} 
+          handleImgClick={ handleImgClick } 
+          showActiveLocation={ showActiveLocation }
+          activeLocation={ activeLocation }
+        />
 
     </div>
   )
 }
 
-const HiddenObjectImage = ({ handleImgClick, imgRef }) => {
+const HiddenObjectImage = ({ handleImgClick, imgRef, showActiveLocation, activeLocation }) => {
   return (
     <div ref={ imgRef } className='hiddenObjectImage backWaldoStyle' onClick={ handleImgClick }>
+      { showActiveLocation 
+        ?
+        <ActiveLocation activeLocation={ activeLocation } />
+        :
+        null
+      }
+    </div>
+  )
+}
+
+const ActiveLocation = ({ activeLocation }) => {
+  return (
+    <div className='clickCircle activeLocation' style={ activeLocation }>
 
     </div>
   )

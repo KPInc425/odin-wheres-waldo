@@ -80,6 +80,23 @@
   transform: translate(-40%, -40%);
 }
 
+.dropDownMenu {
+  position: absolute;
+  border: 2px solid white;
+  text-align: center;
+  z-index: 20;
+}
+
+.dropDownMenu ul {
+  padding: 0;
+  margin: 0;
+}
+
+.dropDownMenu li {
+  list-style: none;
+  border: 1px solid white;
+}
+
 .flex {
   display: flex;
   justify-content: space-around;
