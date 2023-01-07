@@ -117,12 +117,12 @@ function App() {
 }
 
 const DropDownMenu = ({ choiceOne, choiceTwo, choiceThree, location }) => {
-  // console.log(location.left.split('p'));
+
   const dropDownLocation = {
     top: `${Number(location.top.split('p')[0]) - 26}px`,
     left: `${Number(location.left.split('p')[0]) + 38}px`,
   }
-  // console.log(dropDownLocation);
+
   return (
     <div className='dropDownMenu' style={ dropDownLocation }>
       <ul>
