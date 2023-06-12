@@ -19,6 +19,7 @@ function App() {
   const [ activeLocation, setActiveLocation ] = useState({top: `0px`, left: `0px`});
   const [ showCursorLocation, setShowCursorLocation ] = useState(false);
   const [ cursorLocation, setCursorLocation ] = useState({top: `0px`, left: `0px`});
+  const [ imageCoords, setImageCoords ] = useState([0,0]);
   const imgRef = useRef(null);
 
   useEffect(() => {
@@ -144,13 +145,20 @@ const DropDownMenu = ({ choiceOne, choiceTwo, choiceThree, location }) => {
     <div className='dropDownMenu' style={ dropDownLocation }>
       <ul>
         <li><h4>Choices</h4></li>
-        <li>{ choiceOne || "choice1" }</li>
-        <li>{ choiceTwo || "choice2" }</li>
-        <li>{ choiceThree || "choice3" }</li>
+        <MenuChoice choice={ choiceOne || "choice1" }/>
+        <MenuChoice choice={ choiceTwo || "choice2" }/>
+        <MenuChoice choice={ choiceThree || "choice3" }/>
       </ul>
     </div>
   )
 }
+
+const MenuChoice = ({ choice, checkCoords }) => {
+  return (
+    <li onClick={checkCoords}>{ choice }</li>
+  )
+}
+    
 
 const TargetBox = ({ newStyle }) => {
   return (

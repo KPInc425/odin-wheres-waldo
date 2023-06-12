@@ -108,8 +108,15 @@
   cursor: pointer;
 }
 
+.dropDownMenu li:hover {
+  background-color: rgb(179, 0, 0);
+}
+
 .dropDownMenu li:first-of-type {
   cursor: none;
+}
+.dropDownMenu li:first-of-type:hover {
+  background-color: transparent;
 }
 
 .flex {
@@ -148,6 +155,20 @@
   height: 60px;
   color: white;
 }
+
+.appControls button:hover {
+  background-color: white;
+  color: red;
+  border-color: red;
+}
+
+.appControls button:active {
+  background-color: grey;
+  color: red;
+  border-color: red;
+  border-style: inset;
+}
+
 
 .storyBoard {
   margin: 20px 0;
