@@ -168,6 +168,12 @@
   border-color: red;
   border-style: inset;
 }
+.appControls button:disabled {
+  background-color: grey;
+  color: red;
+  border-color: red;
+  border-style: inset;
+}
 
 
 .storyBoard {
@@ -177,11 +183,8 @@
 }
 
 .hiddenObjectImage {
-  /* position: relative; */
   height: 100%;
   width: 100%;
-  /* cursor: url('./media/MagnifyPoint.png'), auto; */
-  cursor: none;
 }
 
 

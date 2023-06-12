@@ -6,9 +6,10 @@ import { getFirestore, doc, getDoc, getDocs, query, collection } from 'firebase/
 import { getFirebaseConfig } from './firebaseConfig';
 import { useEffect, useRef, useState } from 'react';
 
-import hiddenImage from './media/images/image1.png'
+import hiddenImage1 from './media/images/image1.png'
 
 const firebaseConfig = getFirebaseConfig();
+
 
 function App() {
 
@@ -19,7 +20,9 @@ function App() {
   const [ activeLocation, setActiveLocation ] = useState({top: `0px`, left: `0px`});
   const [ showCursorLocation, setShowCursorLocation ] = useState(false);
   const [ cursorLocation, setCursorLocation ] = useState({top: `0px`, left: `0px`});
-  const [ imageCoords, setImageCoords ] = useState([0,0]);
+  const [ imageClickedCoords, setImageClickedCoords ] = useState([0,0]);
+  const [ chosenImage, setChosenImage ] = useState(null);
+  const [ imageIndex, setImageIndex ] = useState(1);
   const imgRef = useRef(null);
 
   useEffect(() => {
@@ -38,6 +41,7 @@ function App() {
     
       setPageDefaultTitle(title);
     }
+    // setChosenImage(hiddenImage1);
     getDBTitle();
   }, [])
 
@@ -50,7 +54,7 @@ function App() {
     console.log(`top: ${rect.top} left: ${rect.left}`);
     console.log(`width: ${rect.width} height: ${rect.height}`);
     console.log(`x: ${x - rect.left} y: ${y - rect.top}`);
-
+    
     if (checkInBounds(x, y)) {
       // Hardcoded #'s are based on cursor size
       // let newLeft = `${x - 5}px`;
@@ -59,12 +63,21 @@ function App() {
       let newTop = `${y - 7}px`;
       setTargetBoxLocation({ top: newTop, left: newLeft });
       setActiveLocation({ top: newTop, left: newLeft })
+      setImageClickedCoords([Math.floor(x - rect.left), Math.floor(y - rect.top)]);
       setShowActiveLocation(true);
       setShowTargetBox(true);
     }
   }
 
+  const startGame = () => {
+    console.log('start game');
+    setChosenImage(hiddenImage1);
+  }
+
   const moveCursor = (e) => {
+    if (chosenImage === null) {
+      return;
+    }
     const x = e.pageX;
     const y = e.pageY;
 
@@ -101,12 +114,22 @@ function App() {
   }
 
   const handleClearClick = (e) => {
+    if (chosenImage === null) {
+      return;
+    }
     const x = e.pageX;
     const y = e.pageY;
     if (!checkInBounds(x, y)) {
       setShowActiveLocation(false);
       setShowTargetBox(false);
     }
+  }
+
+  const checkCoords = async (choice) => {
+    console.log('checkings coords');
+    const choiceCoords = await getDoc(doc(getFirestore(), `image${imageIndex}`, choice));
+    console.log(choiceCoords.data().coords);
+    console.log(imageClickedCoords);
   }
 
 
@@ -118,23 +141,26 @@ function App() {
         ?
         <div>
           <TargetBox newStyle={ targetBoxLocation }/> 
-          <DropDownMenu location={ activeLocation }/>
+          <DropDownMenu location={ activeLocation } checkCoords={ checkCoords }/>
         </div>
         :
         null
       }
-      <ControlBoard />
-      <StoryBoard 
-        imgRef={imgRef}  
-        handleImgClick={ handleImgClick } 
-        showActiveLocation={ showActiveLocation } 
-        activeLocation={ activeLocation }
-      />
+      <ControlBoard startGame={ startGame }/>
+      { chosenImage &&
+        <StoryBoard 
+          imgRef={imgRef}  
+          handleImgClick={ handleImgClick } 
+          showActiveLocation={ showActiveLocation } 
+          activeLocation={ activeLocation }
+          chosenImage={ chosenImage }
+        />
+      }
     </div>
   );
 }
 
-const DropDownMenu = ({ choiceOne, choiceTwo, choiceThree, location }) => {
+const DropDownMenu = ({ choiceOne, choiceTwo, choiceThree, location, checkCoords }) => {
 
   const dropDownLocation = {
     top: `${Number(location.top.split('p')[0]) - 133}px`,
@@ -145,9 +171,9 @@ const DropDownMenu = ({ choiceOne, choiceTwo, choiceThree, location }) => {
     <div className='dropDownMenu' style={ dropDownLocation }>
       <ul>
         <li><h4>Choices</h4></li>
-        <MenuChoice choice={ choiceOne || "choice1" }/>
-        <MenuChoice choice={ choiceTwo || "choice2" }/>
-        <MenuChoice choice={ choiceThree || "choice3" }/>
+        <MenuChoice choice={ choiceOne || "choice1" } checkCoords={checkCoords} />
+        <MenuChoice choice={ choiceTwo || "choice2" } checkCoords={checkCoords} />
+        <MenuChoice choice={ choiceThree || "choice3" } checkCoords={checkCoords} />
       </ul>
     </div>
   )
@@ -155,7 +181,7 @@ const DropDownMenu = ({ choiceOne, choiceTwo, choiceThree, location }) => {
 
 const MenuChoice = ({ choice, checkCoords }) => {
   return (
-    <li onClick={checkCoords}>{ choice }</li>
+    <li onClick={() => checkCoords(choice)}>{ choice }</li>
   )
 }
     
@@ -170,7 +196,7 @@ const TargetBox = ({ newStyle }) => {
   )
 }
 
-const StoryBoard = ({ handleImgClick, imgRef, showActiveLocation, activeLocation }) => {
+const StoryBoard = ({ handleImgClick, imgRef, showActiveLocation, activeLocation, chosenImage }) => {
   return (
     <div className='storyBoard backWaldoStyle'>
 
@@ -179,16 +205,17 @@ const StoryBoard = ({ handleImgClick, imgRef, showActiveLocation, activeLocation
           handleImgClick={ handleImgClick } 
           showActiveLocation={ showActiveLocation }
           activeLocation={ activeLocation }
+          chosenImage={ chosenImage }
         />
 
     </div>
   )
 }
 
-const HiddenObjectImage = ({ handleImgClick, imgRef, showActiveLocation, activeLocation }) => {
+const HiddenObjectImage = ({ handleImgClick, imgRef, showActiveLocation, activeLocation, chosenImage }) => {
   return (
     <div className='hiddenObjectImage backWaldoStyle' onClick={ handleImgClick }>
-      <img ref={ imgRef } src={ hiddenImage } alt='hiddenObjectImage' />
+      <img ref={ imgRef } src={ chosenImage } alt='hiddenObjectImage' />
       { showActiveLocation 
         ?
         <ActiveLocation activeLocation={ activeLocation } />
@@ -207,11 +234,11 @@ const ActiveLocation = ({ activeLocation }) => {
   )
 }
 
-const ControlBoard = () => {
+const ControlBoard = ({startGame}) => {
   return (
     <div className='controlBoard flex backWaldoStyle'>
       <CharacterBox />
-      <AppControls />
+      <AppControls startGame={ startGame } />
     </div>
   )
 }
@@ -229,11 +256,16 @@ const CharacterBox = () => {
   )
 }
 
-const AppControls = () => {
+const AppControls = ({startGame}) => {
+  const [gameStarted, setGameStarted] = useState(false);
+  const handleStartClick = () => {
+    setGameStarted(true);
+    startGame();
+  }
   return (
     <div className='appControls flex backWaldoStyle'>
       <div className="flexButtons">
-        <button className='circleStyle'>Start</button>
+        <button disabled={gameStarted} className='circleStyle' onClick={handleStartClick}>Start</button>
         <button className='circleStyle'>End</button>
         <button className='circleStyle'>Gallery</button>
         <button className='circleStyle'>High Scores</button>
