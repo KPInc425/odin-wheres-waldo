@@ -6,6 +6,8 @@ import { getFirestore, doc, getDoc, getDocs, query, collection } from 'firebase/
 import { getFirebaseConfig } from './firebaseConfig';
 import { useEffect, useRef, useState } from 'react';
 
+import hiddenImage from './media/images/image1.png'
+
 const firebaseConfig = getFirebaseConfig();
 
 function App() {
@@ -40,13 +42,19 @@ function App() {
   const handleImgClick = (e) => {
     const y = e.pageY;
     const x = e.pageX;
+    const rect = imgRef.current.getBoundingClientRect();
 
     console.log({x, y});
+    console.log(`top: ${rect.top} left: ${rect.left}`);
+    console.log(`width: ${rect.width} height: ${rect.height}`);
+    console.log(`x: ${x - rect.left} y: ${y - rect.top}`);
 
     if (checkInBounds(x, y)) {
       // Hardcoded #'s are based on cursor size
+      // let newLeft = `${x - 5}px`;
+      // let newTop = `${y}px`;
       let newLeft = `${x - 7}px`;
-      let newTop = `${y - 29}px`;
+      let newTop = `${y - 7}px`;
       setTargetBoxLocation({ top: newTop, left: newLeft });
       setActiveLocation({ top: newTop, left: newLeft })
       setShowActiveLocation(true);
@@ -68,6 +76,7 @@ function App() {
   const checkInBounds = (x, y) => {
     // Get play area for cursor bounds
     const rect = imgRef.current.getBoundingClientRect();
+    // console.log(imgRef.current)
     const top = rect.top;
     const left = rect.left
     const cursorSize = 5;
@@ -119,8 +128,8 @@ function App() {
 const DropDownMenu = ({ choiceOne, choiceTwo, choiceThree, location }) => {
 
   const dropDownLocation = {
-    top: `${Number(location.top.split('p')[0]) - 26}px`,
-    left: `${Number(location.left.split('p')[0]) + 38}px`,
+    top: `${Number(location.top.split('p')[0]) - 133}px`,
+    left: `${Number(location.left.split('p')[0]) - 33}px`,
   }
 
   return (
@@ -162,7 +171,8 @@ const StoryBoard = ({ handleImgClick, imgRef, showActiveLocation, activeLocation
 
 const HiddenObjectImage = ({ handleImgClick, imgRef, showActiveLocation, activeLocation }) => {
   return (
-    <div ref={ imgRef } className='hiddenObjectImage backWaldoStyle' onClick={ handleImgClick }>
+    <div className='hiddenObjectImage backWaldoStyle' onClick={ handleImgClick }>
+      <img ref={ imgRef } src={ hiddenImage } alt='hiddenObjectImage' />
       { showActiveLocation 
         ?
         <ActiveLocation activeLocation={ activeLocation } />
