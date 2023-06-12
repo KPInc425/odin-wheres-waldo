@@ -53,7 +53,7 @@ function App() {
     console.log({x, y});
     console.log(`top: ${rect.top} left: ${rect.left}`);
     console.log(`width: ${rect.width} height: ${rect.height}`);
-    console.log(`x: ${x - rect.left} y: ${y - rect.top}`);
+    console.log(`x: ${Math.floor(x - rect.left)} y: ${Math.floor(y - rect.top)}`);
     
     if (checkInBounds(x, y)) {
       // Hardcoded #'s are based on cursor size
@@ -125,11 +125,20 @@ function App() {
     }
   }
 
-  const checkCoords = async (choice) => {
+  const checkCoords = async (e, choice) => {
+    e.stopPropagation();
     console.log('checkings coords');
-    const choiceCoords = await getDoc(doc(getFirestore(), `image${imageIndex}`, choice));
-    console.log(choiceCoords.data().coords);
+    const choiceCoords = (await getDoc(doc(getFirestore(), `image${imageIndex}`, choice))).data().coords;
+    console.log(choiceCoords);
     console.log(imageClickedCoords);
+    if ((choiceCoords[0] < (imageClickedCoords[0] + 30) && choiceCoords[0] > (imageClickedCoords[0] - 30)) && (choiceCoords[1] < (imageClickedCoords[1] + 30) && choiceCoords[1] > (imageClickedCoords[1] - 30))) {
+      console.log(choiceCoords[0]);
+      console.log(imageClickedCoords[0]);
+      console.log('Found Object');
+    } else {
+      console.log('Not Here');
+    }
+
   }
 
 
@@ -181,7 +190,7 @@ const DropDownMenu = ({ choiceOne, choiceTwo, choiceThree, location, checkCoords
 
 const MenuChoice = ({ choice, checkCoords }) => {
   return (
-    <li onClick={() => checkCoords(choice)}>{ choice }</li>
+    <li onClick={(e) => checkCoords(e, choice)}>{ choice }</li>
   )
 }
     
