@@ -17,6 +17,7 @@ function App() {
   const [ targetBoxLocation, setTargetBoxLocation ] = useState({top: `0px`, left: `0px`})
   const [ showActiveLocation, setShowActiveLocation ] = useState(false);
   const [ activeLocation, setActiveLocation ] = useState({top: `0px`, left: `0px`});
+  const [ showCursorLocation, setShowCursorLocation ] = useState(false);
   const [ cursorLocation, setCursorLocation ] = useState({top: `0px`, left: `0px`});
   const imgRef = useRef(null);
 
@@ -69,7 +70,14 @@ function App() {
     if (checkInBounds(x, y)) {
       const newTop = `${y}px`;
       const newLeft = `${x}px`;
+      if (!showCursorLocation) {
+        setShowCursorLocation(true);
+      }
       setCursorLocation({top: newTop, left: newLeft});
+    } else {
+      // setShowActiveLocation(false);
+      // setShowTargetBox(false);
+      setShowCursorLocation(false);
     }
   }
 
@@ -104,7 +112,7 @@ function App() {
   return (
     <div className="App" onMouseMove={ moveCursor } onClick={ handleClearClick }>
       <h1>{ pageDefaultTitle || "Find the Hidden Object!" }</h1> 
-      <div id='newCursor' className='cursorCircle' style={ cursorLocation } onClick={ handleImgClick }></div>
+      { showCursorLocation && <div id='newCursor' className='cursorCircle' style={ cursorLocation } onClick={ handleImgClick }></div> }
       { showTargetBox
         ?
         <div>
