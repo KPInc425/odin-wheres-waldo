@@ -81,7 +81,15 @@
   position: absolute;
   width: 60px;
   height: 60px;
-  border: 2px dotted white;
+  border: 2px dotted White;
+  transform: translate(-40%, -40%);
+}
+
+.foundImageBox {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 2px dotted purple;
   transform: translate(-40%, -40%);
 }
 

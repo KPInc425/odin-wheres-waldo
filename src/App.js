@@ -14,8 +14,10 @@ const firebaseConfig = getFirebaseConfig();
 function App() {
 
   const [ pageDefaultTitle, setPageDefaultTitle ] = useState(null);
+  const [ showFoundImageBox, setShowFoundImageBox ] = useState([false, false, false]);
+  const [ foundBoxesLocations, setFoundBoxesLocations ] = useState([{top: `0px`, left: `0px`}, {top: `0px`, left: `0px`}, {top: `0px`, left: `0px`}]);
   const [ showTargetBox, setShowTargetBox ] = useState(false);
-  const [ targetBoxLocation, setTargetBoxLocation ] = useState({top: `0px`, left: `0px`})
+  const [ targetBoxLocation, setTargetBoxLocation ] = useState({top: `0px`, left: `0px`});
   const [ showActiveLocation, setShowActiveLocation ] = useState(false);
   const [ activeLocation, setActiveLocation ] = useState({top: `0px`, left: `0px`});
   const [ showCursorLocation, setShowCursorLocation ] = useState(false);
@@ -127,14 +129,36 @@ function App() {
 
   const checkCoords = async (e, choice) => {
     e.stopPropagation();
+    console.log('Choice: ' + choice);
     console.log('checkings coords');
+    const tempChoice = choice;
     const choiceCoords = (await getDoc(doc(getFirestore(), `image${imageIndex}`, choice))).data().coords;
     console.log(choiceCoords);
     console.log(imageClickedCoords);
     if ((choiceCoords[0] < (imageClickedCoords[0] + 30) && choiceCoords[0] > (imageClickedCoords[0] - 30)) && (choiceCoords[1] < (imageClickedCoords[1] + 30) && choiceCoords[1] > (imageClickedCoords[1] - 30))) {
       console.log(choiceCoords[0]);
       console.log(imageClickedCoords[0]);
+      console.log('Choice: ' + tempChoice);
+      console.log(tempChoice.length);
       console.log('Found Object');
+      const choiceIndex = Number(tempChoice.slice(tempChoice.length - 1, tempChoice.length));
+      console.log(choiceIndex);
+      switch (choiceIndex) {
+        case 1:
+          setShowFoundImageBox([true, showFoundImageBox[1], showFoundImageBox[2]]);
+          setFoundBoxesLocations([activeLocation, foundBoxesLocations[1], foundBoxesLocations[2]]);
+          break;
+        case 2:
+          setShowFoundImageBox([showFoundImageBox[0], true, showFoundImageBox[2]]);
+          setFoundBoxesLocations([foundBoxesLocations[0], activeLocation, foundBoxesLocations[2]]);
+          break;
+        case 3:
+          setShowFoundImageBox([showFoundImageBox[0], showFoundImageBox[1], true]);
+          setFoundBoxesLocations([foundBoxesLocations[0], foundBoxesLocations[1], activeLocation]);
+          break;
+        default:
+          break;
+      }
     } else {
       console.log('Not Here');
     }
@@ -151,6 +175,30 @@ function App() {
         <div>
           <TargetBox newStyle={ targetBoxLocation }/> 
           <DropDownMenu location={ activeLocation } checkCoords={ checkCoords }/>
+        </div>
+        :
+        null
+      }
+      { showFoundImageBox[0]
+        ?
+        <div>
+          <FoundImageBox choice={1} newStyle={ foundBoxesLocations[0] }/> 
+        </div>
+        :
+        null
+      }
+      { showFoundImageBox[1]
+        ?
+        <div>
+          <FoundImageBox choice={2} newStyle={ foundBoxesLocations[1] }/> 
+        </div>
+        :
+        null
+      }
+      { showFoundImageBox[2]
+        ?
+        <div>
+          <FoundImageBox choice={3} newStyle={ foundBoxesLocations[2] }/> 
         </div>
         :
         null
@@ -200,6 +248,16 @@ const TargetBox = ({ newStyle }) => {
     <div>
       <div className='TargetBox' style={ newStyle }>
 
+      </div>
+    </div>
+  )
+}
+
+const FoundImageBox = ({ newStyle, choice }) => {
+  return (
+    <div>
+      <div className='foundImageBox' style={ newStyle }>
+        {`Found Image ${choice}`}
       </div>
     </div>
   )
